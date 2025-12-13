@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ارسال متن</title>
+<style>
+/* سبک مودال ساده */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; 
+  max-width: 400px;
+  text-align: right;
+  font-family: sans-serif;
+}
+
+.close {
+  color: #aaa;
+  float: left;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>نمونه ارسال متن</h2>
+<!-- لینک برای باز کردن مودال -->
+<a href="#" id="openModal">نوشتن متن</a>
+
+<!-- مودال -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>متن خود را وارد کنید:</h3>
+    <textarea id="userText" rows="4" style="width:100%;"></textarea><br>
+    <button id="sendBtn">ارسال</button>
+    <p id="response" style="margin-top:10px;color:green;"></p>
+  </div>
+</div>
+
+<script>
+// المان‌ها
+const modal = document.getElementById("myModal");
+const btnOpen = document.getElementById("openModal");
+const btnClose = document.querySelector(".close");
+const sendBtn = document.getElementById("sendBtn");
+const response = document.getElementById("response");
+
+// باز کردن مودال
+btnOpen.onclick = function(e){
+  e.preventDefault();
+  modal.style.display = "block";
+}
+
+// بستن مودال
+btnClose.onclick = function(){
+  modal.style.display = "none";
+}
+
+// بستن مودال با کلیک بیرون
+window.onclick = function(event){
+  if(event.target == modal){
+    modal.style.display = "none";
+  }
+}
+
+// ارسال متن به سرور
+sendBtn.onclick = async function(){
+  const text = document.getElementById("userText").value.trim();
+  if(!text){
+    response.style.color = "red";
+    response.innerText = "لطفاً متن وارد کنید";
+    return;
+  }
+
+  try{
+    const res = await fetch("/submit", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({text})
+    });
+    const data = await res.json();
+    if(data.status === "ok"){
+      response.style.color = "green";
+      response.innerText = "متن با موفقیت ارسال شد!";
+      document.getElementById("userText").value = "";
+    } else {
+      response.style.color = "red";
+      response.innerText = "خطا در ارسال متن";
+    }
+  } catch(err){
+    response.style.color = "red";
+    response.innerText = "خطا در اتصال به سرور";
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
