@@ -3,6 +3,7 @@ from flask_cors import CORS
 import csv
 from datetime import datetime
 import os
+from flask import render_template
 
 app = Flask(__name__)
 CORS(app)
@@ -29,6 +30,7 @@ def submit():
 
     return jsonify({"status":"ok"})
 
-@app.route('/')
+@app.route("/")
 def home():
-    return 'Server is running'
+    return render_template("index.html")
+
